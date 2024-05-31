@@ -30,3 +30,13 @@ For the initial sync you should choose a date far in the past, so all non-synced
 ```
 php sync.php --modified="2020-12-31 00:00:00"
 ```
+
+## Cronjob
+
+Now you can easily fetch latest changes via cronjob.
+
+If you installed the project into `/opt/kimai-api-sync/` and want to sync once a night you might want to use something like:
+
+```
+17 3 * * * /usr/bin/php /opt/kimai-api-sync/sync.php --modified="2020-12-31 00:00:00" --timesheets >> /var/log/kimai-api-sync.log 2>&1
+```
