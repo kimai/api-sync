@@ -7,12 +7,10 @@
 
 ## Installation
 
-- clone the repo: `git clone `
-- create the database and then the necessary tables, structure can be found in `database.sql`  
-- execute `php composer.phar install --optimize-autoloader -n`
-- edit `configuration.php` and adjust settings to your needs
-
-Everything setup? Great! Now you can sync your data
+- Clone the repo: `git clone git@github.com:kimai/api-sync.git kimai-api-sync`
+- Create the database and then the necessary tables, structure can be found in `database.sql`  
+- Execute `php composer.phar install --optimize-autoloader -n`
+- Edit `configuration.php` and adjust settings to your needs
 
 ## Usage
 
