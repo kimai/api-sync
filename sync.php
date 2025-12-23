@@ -89,32 +89,44 @@ use Symfony\Component\Console\Style\SymfonyStyle;
             $localColumns = []; // column names on local side to prepare SQL statements
 
             // fetch the API result
-            $results = $doGet($client, $settings['endpoint']);
-            if ($results === false) {
-                $io->error(sprintf('Failed to sync data for endpoint: %s', $settings['endpoint']));
-            }
+            $page = 1;
+            while (true) {
+                $separator = (strpos($settings['endpoint'], '?') === false) ? '?' : '&';
+                $url = sprintf('%s%spage=%s&size=500', $settings['endpoint'], $separator, $page);
+                $results = $doGet($client, $url);
 
-            // prepare the array of all entities for the local database by mapping columns
-            foreach ($results as $entity) {
-                $newEntity = [];
-                foreach ($settings['mapping'] as $kimaiField => $localField) {
-                    $key = $localField;
-                    $value = $entity[$kimaiField];
-                    // some values need to be converted to local format (eg. datetime)
-                    if (is_callable($localField)) {
-                        $tmp = call_user_func($localField, $entity, $kimaiField);
-                        $key = $tmp[0];
-                        $value = $tmp[1];
+                if ($results === false) {
+                    $io->error(sprintf('Failed to sync data for endpoint: %s', $settings['endpoint']));
+                    break;
+                }
+
+                if (empty($results)) {
+                    break;
+                }
+
+                // prepare the array of all entities for the local database by mapping columns
+                foreach ($results as $entity) {
+                    $newEntity = [];
+                    foreach ($settings['mapping'] as $kimaiField => $localField) {
+                        $key = $localField;
+                        $value = $entity[$kimaiField];
+                        // some values need to be converted to local format (eg. datetime)
+                        if (is_callable($localField)) {
+                            $tmp = call_user_func($localField, $entity, $kimaiField);
+                            $key = $tmp[0];
+                            $value = $tmp[1];
+                        }
+                        $newEntity[$key] = $value;
                     }
-                    $newEntity[$key] = $value;
+                    if (count($localColumns) === 0) {
+                        $localColumns = array_keys($newEntity);
+                    }
+                    $apiEntities[$entity['id']] = $newEntity;
                 }
-                if (count($localColumns) === 0) {
-                    $localColumns = array_keys($newEntity);
-                }
-                $apiEntities[$entity['id']] = $newEntity;
-            }
 
-            unset($results);
+                $page++;
+                unset($results);
+            }
 
             if (count($apiEntities) === 0) {
                 $io->success('No data found to sync: ' . $title);
@@ -238,7 +250,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
         $syncConfig['Timesheets'] = [
             'table' => 'timesheet',
-            'endpoint' => 'timesheets?user=all&modified_after=' . $since->format('Y-m-d\TH:i:s') . '&size=' . PHP_INT_MAX,
+            'endpoint' => 'timesheets?user=all&modified_after=' . $since->format('Y-m-d\TH:i:s'),
             'mapping' => [
                 'id' => 'kimai_id',
                 'activity' => 'activity',
