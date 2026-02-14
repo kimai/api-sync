@@ -97,7 +97,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
                 if ($results === false) {
                     $io->error(sprintf('Failed to sync data for endpoint: %s', $settings['endpoint']));
-                    break;
+                    return;
                 }
 
                 if (empty($results)) {
