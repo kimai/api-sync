@@ -92,12 +92,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
             $apiEntities = [];
             $existingEntities = []; // mapping local id to kimai id in local database
             $localColumns = []; // column names on local side to prepare SQL statements
+            $maxPageSize = 500;
 
             // fetch the API result
             $page = 1;
-            while (true) {
-                $separator = (strpos($settings['endpoint'], '?') === false) ? '?' : '&';
-                $url = sprintf('%s%spage=%s&size=500', $settings['endpoint'], $separator, $page);
+            $loadMorePages = true;
+            $separator = (!str_contains($settings['endpoint'], '?')) ? '?' : '&';
+
+            while ($loadMorePages) {
+                $url = sprintf('%s%spage=%s&size=%s', $settings['endpoint'], $separator, $page, $maxPageSize);
                 $results = $doGet($client, $url);
 
                 if ($results === false) {
@@ -107,6 +110,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
                 if (empty($results)) {
                     break;
+                }
+
+                if (count($results) < $maxPageSize) {
+                    $loadMorePages = false;
                 }
 
                 // prepare the array of all entities for the local database by mapping columns
