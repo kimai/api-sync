@@ -1,7 +1,7 @@
 <?php
 
 const KIMAI_API_URL = 'https://demo.kimai.org/api';
-const KIMAI_API_TOKEN = 'api_kitten_super';
+const KIMAI_API_TOKEN = ''; // create at https://demo.kimai.org/en/profile/susan_super/api-token
 const DATABASE_CONNECTION = 'mysql:dbname=sync-test;host=127.0.0.1';
 const DATABASE_USER = 'root';
 const DATABASE_PASSWORD = 'password';
