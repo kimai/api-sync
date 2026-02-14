@@ -32,7 +32,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 (new SingleCommandApplication())
     ->setName('Sync Kimai data via API')
-    ->setVersion('1.0')
+    ->setVersion('1.1')
     ->addOption('timesheets', null, InputOption::VALUE_NONE, 'Only sync timesheets (for hourly cronjob)')
     ->addOption('modified', null, InputOption::VALUE_REQUIRED, 'Only timesheets that were modified after this date will be synced, by default latest 24 hours. Format: 2022-01-14 13:45:47')
     ->setCode(function (InputInterface $input, OutputInterface $output) {
@@ -60,9 +60,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
             return [$fieldName, $converted];
         };
 
+        $baseUri = KIMAI_API_URL;
+        if (!str_ends_with($baseUri, '/')) {
+            $baseUri = $baseUri . '/';
+        }
+
         $connection = new PDO(DATABASE_CONNECTION, DATABASE_USER, DATABASE_PASSWORD);
         $clientOptions = [
-            'base_uri' => KIMAI_API_URL,
+            'base_uri' => $baseUri,
             'verify' => false,
             'headers' => ['Authorization' => 'Bearer ' . KIMAI_API_TOKEN]
         ];
