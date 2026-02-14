@@ -2,7 +2,6 @@
     "name": "kimai/cloud-sync",
     "license": "AGPL-3.0-or-later",
     "type": "project",
-    "version": "1.0",
     "description": "Sync data from Kimai to a local database",
     "authors": [
         {
